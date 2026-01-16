@@ -10,11 +10,12 @@ namespace WPFBudgetPlanerare.Models
     {
         Lön,
         Mat,
-        Hyra,
+        Boende,
         Transport,
         Barn,
         Fritid,
         Streaming,
-        SaaS
+        SaaS,
+        Övrigt
     }
 }

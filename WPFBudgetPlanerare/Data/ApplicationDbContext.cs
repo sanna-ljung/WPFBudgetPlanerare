@@ -11,9 +11,14 @@ namespace WPFBudgetPlanerare.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Transaction> Transactions { get; set; }
-        //public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        //{
-        //}
+
+        public ApplicationDbContext()
+        {
+        }
+        
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

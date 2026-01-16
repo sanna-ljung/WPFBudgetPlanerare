@@ -39,14 +39,20 @@
                        VerticalAlignment="Center"
                        Margin="0,0,20,0" />
 
+            
             <Button Content="Lägg till"
                     Command="{Binding AddTransactionCommand}"
-                    Width="90" Margin="0,0,10,0" />
+                    Style="{StaticResource RoundButtonStyle}"
+                    Width="90" 
+                    Height="30"
+                    Margin="0,0,10,0" />
 
             <Button Content="Ta bort"
                     Command="{Binding RemoveTransactionCommand}"
+                    Style="{StaticResource RoundButtonStyle}"
                     CommandParameter="{Binding SelectedTransaction}"
-                    Width="90" />
+                    Width="90" 
+                    Height="30"/>
         </StackPanel>
     </Grid>
 </Window>
