@@ -5,15 +5,69 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <SolidColorBrush x:Key="PrimaryColor" Color="Lavender"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="LavenderBlush"/>
+        <SolidColorBrush x:Key="AccentColor" Color="Plum"/>
+        <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
 
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
-            <Setter Property="Foreground" Value="Black"/>
+        <!-- ButtonStyle -->
+        <Style x:Key="RoundButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <!-- Hover -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
+
+        <!-- Default Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+        </Style>
+
+        <!-- Windowstyle -->
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+        </Style>
+
+        <!-- DataGridstyle -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="RowBackground" Value="{StaticResource SecondaryColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+
+        <!-- TextBlockstyle -->
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
         </Style>
     </Application.Resources>
+
 </Application>
