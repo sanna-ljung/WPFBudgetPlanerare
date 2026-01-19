@@ -4,70 +4,294 @@
              xmlns:local="clr-namespace:WPFBudgetPlanerare"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="PrimaryColor" Color="Lavender"/>
-        <SolidColorBrush x:Key="SecondaryColor" Color="LavenderBlush"/>
-        <SolidColorBrush x:Key="AccentColor" Color="Plum"/>
+        <!-- Colours -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#F0E6FF"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#FFE6F7"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#FCBAE2"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#6FC9C5"/>
+        <SolidColorBrush x:Key="IncomeColor" Color="#87CEEB"/>
+        <SolidColorBrush x:Key="ExpenseColor" Color="#FFB6C1"/>
+        <SolidColorBrush x:Key="TextDark" Color="#2F4F4F"/>
+        <SolidColorBrush x:Key="TextLight" Color="#696969"/>
+        <SolidColorBrush x:Key="EmojiColor" Color="#BA4F9F"/>
+
+        <!-- guld färg för knappar -->
+        <SolidColorBrush x:Key="GoldColor" Color="#FFD700"/>
+        <SolidColorBrush x:Key="GoldDark" Color="#FFC700"/>
+        <SolidColorBrush x:Key="GoldBorder" Color="#DAA520"/>
+
+        <!-- guldgradient -->
+        <LinearGradientBrush x:Key="GoldenGradientBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop x:Name="GradStop1" Color="#FFE933" Offset="0"/>
+            <GradientStop x:Name="GradStop2" Color="#FFD700" Offset="0.5"/>
+            <GradientStop x:Name="GradStop3" Color="#FFC700" Offset="1"/>
+        </LinearGradientBrush>
+
         <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
 
-        <!-- ButtonStyle -->
-        <Style x:Key="RoundButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+        <!-- guldknappar, Hover Animation -->
+        <Style x:Key="GoldenButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GoldBorder}"/>
             <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="8">
+                        <Border x:Name="border"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Background>
+                                <LinearGradientBrush x:Name="gradientBrush" StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop x:Name="GradStop1" Color="#FFE933" Offset="0"/>
+                                    <GradientStop x:Name="GradStop2" Color="#FFD700" Offset="0.5"/>
+                                    <GradientStop x:Name="GradStop3" Color="#FFC700" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+
                             <ContentPresenter HorizontalAlignment="Center" 
-                                      VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center"
+                                              RenderTransformOrigin="0.5,0.5">
+                                <ContentPresenter.RenderTransform>
+                                    <ScaleTransform x:Name="scaleTransform" ScaleX="1" ScaleY="1"/>
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
                         </Border>
+
+                        <ControlTemplate.Triggers>
+                            <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         From="1" To="1.08"
+                                                         Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         From="1" To="1.08"
+                                                         Duration="0:0:0.2"/>
+                                        <!-- Animate gradient stop colors smoothly -->
+                                        <ColorAnimation Storyboard.TargetName="GradStop1"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFE933" To="#FFC700"
+                                                        Duration="0:0:0.2"/>
+                                        <ColorAnimation Storyboard.TargetName="GradStop2"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFD700" To="#FFB700"
+                                                        Duration="0:0:0.2"/>
+                                        <ColorAnimation Storyboard.TargetName="GradStop3"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFC700" To="#FFAA00"
+                                                        Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+
+                            <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         From="1.08" To="0.95"
+                                                         Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         From="1.08" To="0.95"
+                                                         Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+
+                            <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="1"
+                                                         Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         To="1"
+                                                         Duration="0:0:0.2"/>
+                                        <!-- Animate gradient stop colors back smoothly -->
+                                        <ColorAnimation Storyboard.TargetName="GradStop1"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFC700" To="#FFE933"
+                                                        Duration="0:0:0.2"/>
+                                        <ColorAnimation Storyboard.TargetName="GradStop2"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFB700" To="#FFD700"
+                                                        Duration="0:0:0.2"/>
+                                        <ColorAnimation Storyboard.TargetName="GradStop3"
+                                                        Storyboard.TargetProperty="Color"
+                                                        From="#FFAA00" To="#FFC700"
+                                                        Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
 
-            <!-- Hover -->
+        <!-- add -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource GoldenButtonStyle}">
+        </Style>
+
+        <!-- delete -->
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource GoldenButtonStyle}">
+        </Style>
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,4,0,8"/>
+        </Style>
+
+        <!-- ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,4,0,8"/>
+        </Style>
+
+        <!-- Window Style -->
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+        </Style>
+
+        <!-- DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Background" Value="#FAFAFA"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="ColumnHeaderHeight" Value="35"/>
+            <Setter Property="RowHeight" Value="30"/>
+        </Style>
+
+        <!-- DataGrid Column Header Style -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="#C74FC7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        
+        <!--DataGridRowstyle-->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FCD5EF"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-
-        <!-- Default Button Style -->
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
-            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="True"/>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                </MultiTrigger>
+            </Style.Triggers>
         </Style>
 
-        <!-- Windowstyle -->
-        <Style TargetType="Window">
-            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
-            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        </Style>
 
-        <!-- DataGridstyle -->
-        <Style TargetType="DataGrid">
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-            <Setter Property="RowBackground" Value="{StaticResource SecondaryColor}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-        </Style>
-
-        <!-- TextBlockstyle -->
+        <!-- TextBlock Style -->
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         </Style>
+
+        <!-- Title TextBlock -->
+        <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+        </Style>
+
+        <!-- Section Header TextBlock -->
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <!-- Label TextBlock -->
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+            <Setter Property="Margin" Value="0,8,0,3"/>
+        </Style>
+
+        <!-- Emoji style -->
+        <Style x:Key="EmojiStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="#BA4F9F"/>
+        </Style>
+
+        <!-- Card Border Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+        <!-- Summary Card Style -->
+        <Style x:Key="SummaryCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFF5FB"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+
     </Application.Resources>
 
 </Application>

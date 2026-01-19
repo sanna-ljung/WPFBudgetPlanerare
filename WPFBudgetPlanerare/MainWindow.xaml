@@ -5,54 +5,272 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFBudgetPlanerare"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="10">
+        Title="Budget Planerare" 
+        Height="700" 
+        Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource PrimaryColor}">
+
+    <Grid Margin="0">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- transactionslista -->
-        <DataGrid Grid.Row="0"
-                  ItemsSource="{Binding Transactions}"
-                  AutoGenerateColumns="False"
-                  SelectedItem="{Binding SelectedTransaction}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Namn" Binding="{Binding Name}" />
-                <DataGridTextColumn Header="Belopp" Binding="{Binding Amount}" />
-                <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
-                <DataGridTextColumn Header="Kategori" Binding="{Binding Category}" />
-                <DataGridTextColumn Header="Återkommande" Binding="{Binding Recurrence}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- Header -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource AccentColor}" 
+                Padding="20">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Budgetplanerare" 
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           FontFamily="Cambria"
+                           Foreground="#FFF5FB"
+                           FontSize="20"/>
+            </StackPanel>
+        </Border>
 
-         <!--knappar, lista--> 
-        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                    HorizontalAlignment="Right" Margin="0,10,0,0">
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="280" />
+            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Månadsprognos:"
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0" />
+            <!-- Input Form -->
+            <Border Grid.Column="0" 
+                    Style="{StaticResource CardStyle}"
+                    Background="#FFF5FB">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0">
+                        <TextBlock Text="Årsinkomst" Style="{StaticResource LabelStyle}" />
+                        <TextBox Text="{Binding AnnualIncome, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Text="{Binding MonthlyForecast}"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       Margin="0,0,20,0" />
+                        <TextBlock Text="Årsarbetstid (timmar)" Style="{StaticResource LabelStyle}" />
+                        <TextBox Text="{Binding AnnualWorkHours, UpdateSourceTrigger=PropertyChanged}" />
 
-            
-            <Button Content="Lägg till"
-                    Command="{Binding AddTransactionCommand}"
-                    Style="{StaticResource RoundButtonStyle}"
-                    Width="90" 
-                    Height="30"
-                    Margin="0,0,10,0" />
+                        <TextBlock Text="Timlön" Style="{StaticResource LabelStyle}" />
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="HourlyRate"
+                                    StringFormat="{}{0:N0} kr/h"
+                                    ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
 
-            <Button Content="Ta bort"
-                    Command="{Binding RemoveTransactionCommand}"
-                    Style="{StaticResource RoundButtonStyle}"
-                    CommandParameter="{Binding SelectedTransaction}"
-                    Width="90" 
-                    Height="30"/>
-        </StackPanel>
+                        <TextBlock Text="Månadsinkomst" Style="{StaticResource LabelStyle}" />
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="MonthlyIncomeFromAnnual"
+                                    StringFormat="{}{0:N0} kr/mån"
+                                    ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+
+                        <TextBlock></TextBlock>
+                        <TextBlock Text="Ny transaktion" 
+                                   Style="{StaticResource SectionHeaderStyle}"
+                                   Foreground="#E684B6"/>
+
+                        <!-- Name Input -->
+                        <TextBlock Text="Namn" 
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Text="t.ex. Lön, Mat" FontSize="11" Foreground="#999999" Margin="0,4,0,-20"/>
+                        <TextBox Text="{Binding NewTransactionName}"/>
+
+
+                        <!-- Amount Input -->
+                        <TextBlock Text="Belopp" 
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Text="0,00" FontSize="11" Foreground="#999999" Margin="0,4,0,-20"/>
+                        <TextBox Text="{Binding NewTransactionAmount, UpdateSourceTrigger=PropertyChanged}" />
+
+
+
+                        <!-- Type Selection -->
+                        <TextBlock Text="Typ" 
+                                   Style="{StaticResource LabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding TransactionTypes}"
+                                  SelectedItem="{Binding SelectedTransactionType}"
+                                  SelectedIndex="0"/>
+
+
+                        <!-- Category Selection -->
+                        <TextBlock Text="Kategori" 
+                                   Style="{StaticResource LabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding Categories}"
+                                  SelectedItem="{Binding SelectedCategory}"
+                                  SelectedIndex="0"/>
+
+                        <!-- Recurrence Selection -->
+                        <TextBlock Text="Återkommande" 
+                                   Style="{StaticResource LabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding RecurrenceTypes}"
+                                  SelectedItem="{Binding SelectedRecurrenceType}"
+                                  SelectedIndex="0"/>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Vertical" Margin="0,20,0,0">
+                            <Button Content="➕ Lägg till"
+                                    Style="{StaticResource GoldenButtonStyle}"
+                                    Command="{Binding AddTransactionCommand}"
+                                    Margin="0,0,0,8"
+                                    Height="40"
+                                    FontSize="13"/>
+                            <Button Content="🗑️ Ta bort"
+                                    Style="{StaticResource GoldenButtonStyle}"
+                                    Command="{Binding RemoveTransactionCommand}"
+                                    Height="40"
+                                    FontSize="13"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Transaction List -->
+            <Grid Grid.Column="1" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,8">
+                    <TextBlock Text="📊" 
+                               Style="{StaticResource EmojiStyle}"
+                               Foreground="#BA4F9F"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Text="Transaktioner" 
+                               Style="{StaticResource SectionHeaderStyle}"
+                               Foreground="#E684B6"
+                               Margin="0"/>
+                </StackPanel>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Transactions}"
+                          SelectedItem="{Binding SelectedTransaction}"
+                          Background="#FFF5FB"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Namn" 
+                                            Binding="{Binding Name}"
+                                            Width="120"/>
+                        <DataGridTextColumn Header="Belopp" 
+                                            Binding="{Binding Amount}"
+                                            Width="90"/>
+                        <DataGridTextColumn Header="Typ" 
+                                            Binding="{Binding Type}"
+                                            Width="80"/>
+                        <DataGridTextColumn Header="Kategori" 
+                                            Binding="{Binding Category}"
+                                            Width="110"/>
+                        <DataGridTextColumn Header="Återkommande" 
+                                            Binding="{Binding Recurrence}"
+                                            Width="110"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <!-- Statistics -->
+            <StackPanel Grid.Column="2" 
+                        Margin="0,20,20,20"
+                        VerticalAlignment="Top">
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="📈" 
+                               Style="{StaticResource EmojiStyle}"
+                               Foreground="#BA4F9F"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Text="Översikt" 
+                               Style="{StaticResource SectionHeaderStyle}"
+                               Foreground="#E684B6"
+                               Margin="0"/>
+                </StackPanel>
+
+                <!-- Income -->
+                <Border Style="{StaticResource SummaryCardStyle}"
+                        BorderBrush="{StaticResource IncomeColor}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="💵" 
+                                       Style="{StaticResource EmojiStyle}"
+                                       Margin="0,0,6,0"/>
+                            <TextBlock Text="Total inkomst" 
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextLight}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalIncome}" 
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource IncomeColor}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Expense -->
+                <Border Style="{StaticResource SummaryCardStyle}"
+                        BorderBrush="{StaticResource ExpenseColor}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="💸" 
+                                       Style="{StaticResource EmojiStyle}"
+                                       Margin="0,0,6,0"/>
+                            <TextBlock Text="Total utgift" 
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextLight}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalExpense}" 
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource ExpenseColor}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Forecast -->
+                <Border Style="{StaticResource SummaryCardStyle}"
+                        BorderBrush="{StaticResource AccentColor}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="🎯" 
+                                       Style="{StaticResource EmojiStyle}"
+                                       Margin="0,0,6,0"/>
+                            <TextBlock Text="Månadsprognos" 
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextLight}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding MonthlyForecast}" 
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource AccentColor}"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" 
+                Background="{StaticResource SecondaryColor}"
+                BorderBrush="{StaticResource AccentColor}"
+                BorderThickness="0,2,0,0"
+                Padding="20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                
+                <TextBlock Text="© 2026 S. Ljung" 
+               FontSize="14"
+               Foreground="#CF6392"/>
+                <TextBlock Text="🪻" 
+                Style="{StaticResource EmojiStyle}"
+                FontSize="14"           
+                Margin="0,0,8,0"
+                Foreground="#E073A3"/>
+            </StackPanel>
+
+        </Border>
+
     </Grid>
 </Window>
