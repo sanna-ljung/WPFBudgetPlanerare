@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Budget Planerare" 
         Height="700" 
-        Width="1000"
+        Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource PrimaryColor}">
 
@@ -42,7 +42,7 @@
             <!-- Input Form -->
             <Border Grid.Column="0" 
                     Style="{StaticResource CardStyle}"
-                    Background="#FFF5FB">
+                    Background="#FFF8FC">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="0">
                         <TextBlock Text="Årsinkomst" Style="{StaticResource LabelStyle}" />
@@ -111,6 +111,24 @@
                                   SelectedItem="{Binding SelectedRecurrenceType}"
                                   SelectedIndex="0"/>
 
+                        <!-- ComboBox OM Yearly är vald -->
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <StackPanel Orientation="Horizontal" 
+                                  Visibility="{Binding SelectedRecurrenceType, 
+                                  Converter={StaticResource RecurrenceTypeToVisibilityConverter}}">
+                                <Label Content="Välj månad:" Margin="0,10,0,0" />
+                                <ComboBox ItemsSource="{Binding Months}" 
+                                     SelectedItem="{Binding SelectedMonth}" 
+                                     Width="150" Margin="5,10,0,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource MonthNumberToNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
                         <!-- Action Buttons -->
                         <StackPanel Orientation="Vertical" Margin="0,20,0,0">
                             <Button Content="➕ Lägg till"
@@ -150,7 +168,7 @@
                 <DataGrid Grid.Row="1"
                           ItemsSource="{Binding Transactions}"
                           SelectedItem="{Binding SelectedTransaction}"
-                          Background="#FFF5FB"
+                          Background="#FFF8FC"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False">
@@ -170,85 +188,143 @@
                                             Width="110"/>
                         <DataGridTextColumn Header="Återkommande" 
                                             Binding="{Binding Recurrence}"
-                                            Width="110"/>
+                                            Width="120"/>
+                        <DataGridTextColumn Header="Månad (återkommande)"
+                                            Binding="{Binding MonthOfYear,
+                                            Converter={StaticResource MonthNumberToNameConverter}}"
+                                            Width="150"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
 
             <!-- Statistics -->
             <StackPanel Grid.Column="2" 
-                        Margin="0,20,20,20"
-                        VerticalAlignment="Top">
+            Margin="0,20,20,20"
+            VerticalAlignment="Top">
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                     <TextBlock Text="📈" 
-                               Style="{StaticResource EmojiStyle}"
-                               Foreground="#BA4F9F"
-                               Margin="0,0,8,0"/>
+                   Style="{StaticResource EmojiStyle}"
+                   Foreground="#BA4F9F"
+                   Margin="0,0,8,0"/>
                     <TextBlock Text="Översikt" 
-                               Style="{StaticResource SectionHeaderStyle}"
-                               Foreground="#E684B6"
-                               Margin="0"/>
+                   Style="{StaticResource SectionHeaderStyle}"
+                   Foreground="#E684B6"
+                   Margin="0"/>
                 </StackPanel>
 
                 <!-- Income -->
                 <Border Style="{StaticResource SummaryCardStyle}"
-                        BorderBrush="{StaticResource IncomeColor}">
+                    BorderBrush="#E684B6">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="💵" 
-                                       Style="{StaticResource EmojiStyle}"
-                                       Margin="0,0,6,0"/>
+                           Style="{StaticResource EmojiStyle}"
+                           Margin="0,0,6,0"/>
                             <TextBlock Text="Total inkomst" 
-                                       FontSize="11"
-                                       Foreground="{StaticResource TextLight}"/>
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding TotalIncome}" 
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource IncomeColor}"/>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="TotalIncome" 
+                                    StringFormat="{}{0:N0} kr"
+                                    ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
 
                 <!-- Expense -->
                 <Border Style="{StaticResource SummaryCardStyle}"
-                        BorderBrush="{StaticResource ExpenseColor}">
+            BorderBrush="#C774E8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="💸" 
-                                       Style="{StaticResource EmojiStyle}"
-                                       Margin="0,0,6,0"/>
+                           Style="{StaticResource EmojiStyle}"
+                           Margin="0,0,6,0"/>
                             <TextBlock Text="Total utgift" 
-                                       FontSize="11"
-                                       Foreground="{StaticResource TextLight}"/>
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding TotalExpense}" 
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource ExpenseColor}"/>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="TotalExpense" 
+                                   StringFormat="{}{0:N0} kr"
+                                   ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
 
-                <!-- Forecast -->
+                <!-- Monthly Forecast (denna månad) -->
                 <Border Style="{StaticResource SummaryCardStyle}"
-                        BorderBrush="{StaticResource AccentColor}">
+            BorderBrush="#AD8CFF">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="🎯" 
-                                       Style="{StaticResource EmojiStyle}"
-                                       Margin="0,0,6,0"/>
+                           Style="{StaticResource EmojiStyle}"
+                           Margin="0,0,6,0"/>
                             <TextBlock Text="Månadsprognos" 
-                                       FontSize="11"
-                                       Foreground="{StaticResource TextLight}"/>
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding MonthlyForecast}" 
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource AccentColor}"/>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="MonthlyForecast" 
+                                   StringFormat="{}{0:N0} kr"
+                                   ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Next Month Forecast (nästa månad) -->
+                <Border Style="{StaticResource SummaryCardStyle}"
+            BorderBrush="#8795E8">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="📅" 
+                           Style="{StaticResource EmojiStyle}"
+                           Margin="0,0,6,0"/>
+                            <TextBlock Text="Nästa månad" 
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"/>
+                        </StackPanel>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="NextMonthForecast" 
+                                    StringFormat="{}{0:N0} kr"
+                                    ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Average Monthly Forecast (genomsnitt) -->
+                <Border Style="{StaticResource SummaryCardStyle}"
+            BorderBrush="#94D0FF">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="📊" 
+                           Style="{StaticResource EmojiStyle}"
+                           Margin="0,0,6,0"/>
+                            <TextBlock Text="Genomsnitt/mån" 
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"/>
+                        </StackPanel>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <Binding Path="AverageMonthlyForecast" 
+                                    StringFormat="{}{0:N0} kr"
+                                    ConverterCulture="sv-SE"/>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
 
             </StackPanel>
+
 
         </Grid>
 
@@ -259,7 +335,7 @@
                 BorderThickness="0,2,0,0"
                 Padding="20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                
+
                 <TextBlock Text="© 2026 S. Ljung" 
                FontSize="14"
                Foreground="#CF6392"/>

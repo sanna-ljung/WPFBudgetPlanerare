@@ -2,8 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WPFBudgetPlanerare"
+             xmlns:converters="clr-namespace:WPFBudgetPlanerare.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <converters:MonthNumberToNameConverter x:Key="MonthNumberToNameConverter"/>
+        <converters:RecurrenceTypeToVisibilityConverter x:Key="RecurrenceTypeToVisibilityConverter"/>
         <!-- Colours -->
         <SolidColorBrush x:Key="PrimaryColor" Color="#F0E6FF"/>
         <SolidColorBrush x:Key="SecondaryColor" Color="#FFE6F7"/>
@@ -19,13 +22,6 @@
         <SolidColorBrush x:Key="GoldColor" Color="#FFD700"/>
         <SolidColorBrush x:Key="GoldDark" Color="#FFC700"/>
         <SolidColorBrush x:Key="GoldBorder" Color="#DAA520"/>
-
-        <!-- guldgradient -->
-        <LinearGradientBrush x:Key="GoldenGradientBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop x:Name="GradStop1" Color="#FFE933" Offset="0"/>
-            <GradientStop x:Name="GradStop2" Color="#FFD700" Offset="0.5"/>
-            <GradientStop x:Name="GradStop3" Color="#FFC700" Offset="1"/>
-        </LinearGradientBrush>
 
         <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
 
@@ -74,7 +70,6 @@
                                                          Storyboard.TargetProperty="ScaleY"
                                                          From="1" To="1.08"
                                                          Duration="0:0:0.2"/>
-                                        <!-- Animate gradient stop colors smoothly -->
                                         <ColorAnimation Storyboard.TargetName="GradStop1"
                                                         Storyboard.TargetProperty="Color"
                                                         From="#FFE933" To="#FFC700"
@@ -117,7 +112,6 @@
                                                          Storyboard.TargetProperty="ScaleY"
                                                          To="1"
                                                          Duration="0:0:0.2"/>
-                                        <!-- Animate gradient stop colors back smoothly -->
                                         <ColorAnimation Storyboard.TargetName="GradStop1"
                                                         Storyboard.TargetProperty="Color"
                                                         From="#FFC700" To="#FFE933"
@@ -266,14 +260,14 @@
             <Setter Property="Margin" Value="0,8,0,3"/>
         </Style>
 
-        <!-- Emoji style -->
+        <!-- Emoji -->
         <Style x:Key="EmojiStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Foreground" Value="#BA4F9F"/>
         </Style>
 
-        <!-- Card Border Style -->
+        <!-- Card Border -->
         <Style x:Key="CardStyle" TargetType="Border">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
@@ -283,9 +277,9 @@
             <Setter Property="Margin" Value="10"/>
         </Style>
 
-        <!-- Summary Card Style -->
+        <!-- Summary Card -->
         <Style x:Key="SummaryCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="#FFF5FB"/>
+            <Setter Property="Background" Value="#FFF8FC"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="12"/>
