@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Printing;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Collections.ObjectModel;
 using WPFBudgetPlanerare.Data;
 using WPFBudgetPlanerare.Models;
 using WPFBudgetPlanerare.Services;
@@ -16,12 +9,13 @@ namespace WPFBudgetPlanerare.ViewModels
     public class MainViewModel : BaseViewModel
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly ForecastCalculationService _forecastService;
 
         //samlingar till UI
         //lista som DataGrid binder till
         public ObservableCollection<Transaction> Transactions { get; }
 
-        //listor till ComboBoxar(enum)
+        //listor till ComboBoxar
         public IEnumerable<TransactionType> TransactionTypes =>
             Enum.GetValues(typeof(TransactionType)).Cast<TransactionType>();
 
@@ -31,12 +25,92 @@ namespace WPFBudgetPlanerare.ViewModels
         public IEnumerable<RecurrenceType> RecurrenceTypes =>
             Enum.GetValues(typeof(RecurrenceType)).Cast<RecurrenceType>();
 
+        public IEnumerable<int> Months => Enumerable.Range(1, 12);
+
+        public Dictionary<int, string> MonthNames => new()
+        {
+            { 1, "Januari" },
+            {2, "Februari" },
+            {3, "Mars" },
+            {4, "April" },
+            {5, "Maj" },
+            {6, "Juni" },
+            {7, "Juli" },
+            {8, "Augusti" },
+            {9, "September" },
+            {10, "Oktober" },
+            {11, "November" },
+            {12, "December" }
+
+        };
+
         // inmatning
-        public string NewTransactionName { get; set; }
-        public decimal NewTransactionAmount { get; set; }
-        public TransactionType SelectedTransactionType { get; set; }
-        public Category SelectedCategory { get; set; }
-        public RecurrenceType SelectedRecurrenceType { get; set; }
+        
+        private string _newTransactionName;
+        public string NewTransactionName
+        {
+            get => _newTransactionName;
+            set
+            {
+                _newTransactionName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private decimal _newTransactionAmount;
+        public decimal NewTransactionAmount
+        {
+            get => _newTransactionAmount;
+            set
+            {
+                _newTransactionAmount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private TransactionType _selectedTransactionType;
+        public TransactionType SelectedTransactionType
+        {
+            get => _selectedTransactionType;
+            set
+            {
+                _selectedTransactionType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Category _selectedCategory;
+        public Category SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                _selectedCategory = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _selectedMonth = DateTime.Now.Month;
+        public int SelectedMonth
+        {
+            get => _selectedMonth;
+            set
+            {
+                _selectedMonth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private RecurrenceType _selectedRecurrenceType;
+        public RecurrenceType SelectedRecurrenceType
+        {
+            get => _selectedRecurrenceType;
+            set
+            {
+                _selectedRecurrenceType = value;
+                OnPropertyChanged();
+            }
+        }
 
         // selected (DataGrid)
         private Transaction _selectedTransaction;
@@ -111,7 +185,24 @@ namespace WPFBudgetPlanerare.ViewModels
             }
         }
 
-        public decimal MonthlyForecast => TotalIncome - TotalExpense;
+        // Prognos för denna månad
+        public decimal MonthlyForecast =>
+            _forecastService.CalculateMonthlyForecast(Transactions, MonthlyIncomeFromAnnual, DateTime.Now.Month);
+
+        // Prognos för nästa månad
+        public decimal NextMonthForecast
+        {
+            get
+            {
+                int nextMonth = DateTime.Now.AddMonths(1).Month;
+                return _forecastService.CalculateMonthlyForecast(Transactions, MonthlyIncomeFromAnnual, nextMonth);
+            }
+        }
+
+        // Genomsnittlig månadsprognos
+        public decimal AverageMonthlyForecast =>
+            _forecastService.CalculateAverageMonthlyForecast(Transactions, MonthlyIncomeFromAnnual);
+
 
         // commands
         public RelayCommand AddTransactionCommand { get; }
@@ -121,8 +212,8 @@ namespace WPFBudgetPlanerare.ViewModels
         public MainViewModel()
         {
             _dbContext = new ApplicationDbContext();
+            _forecastService = new ForecastCalculationService();
 
-            //ladda data från databasen
             Transactions = new ObservableCollection<Transaction>(_dbContext.Transactions.ToList());
 
             //initiera commands
@@ -148,7 +239,10 @@ namespace WPFBudgetPlanerare.ViewModels
                 Amount = NewTransactionAmount,
                 Type = SelectedTransactionType,
                 Category = SelectedCategory,
-                Recurrence = SelectedRecurrenceType
+                Recurrence = SelectedRecurrenceType,
+                MonthOfYear = SelectedRecurrenceType == RecurrenceType.Yearly
+                    ? SelectedMonth
+                    : null
             };
 
             _dbContext.Transactions.Add(transaction);
@@ -156,6 +250,10 @@ namespace WPFBudgetPlanerare.ViewModels
 
             Transactions.Add(transaction);
             UpdateTotals();
+
+            NewTransactionName = string.Empty;
+            NewTransactionAmount = 0;
+            SelectedMonth = DateTime.Now.Month;
         }
 
         private void RemoveTransaction()
@@ -180,14 +278,24 @@ namespace WPFBudgetPlanerare.ViewModels
             //lägg till månadsinkomst från årsinkomst
             TotalIncome = transactionIncome + MonthlyIncomeFromAnnual;
 
-            //beräkna total utgift, årskostnad delat på 12
+            //beräkna total utgift, årskostnad delat på 12 m månadshänsyn
             TotalExpense = Transactions
                 .Where(t => t.Type == TransactionType.Expense)
                 .Sum(t =>
-                    t.Recurrence == RecurrenceType.Yearly
-                        ? t.Amount / 12
-                        : t.Amount
-                );
+                {
+                    if (t.Recurrence == RecurrenceType.Monthly)
+                        return t.Amount;
+
+                    if (t.Recurrence == RecurrenceType.Yearly)
+                        return t.Amount / 12;
+
+                    return t.Amount;
+                });
+
+            //uppdaterar prognoser när data ändras
+            OnPropertyChanged(nameof(MonthlyForecast));
+            OnPropertyChanged(nameof(NextMonthForecast));
+            OnPropertyChanged(nameof(AverageMonthlyForecast));
         }
     }
 }

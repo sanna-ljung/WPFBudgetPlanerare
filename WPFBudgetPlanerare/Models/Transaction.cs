@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WPFBudgetPlanerare.Models
+﻿namespace WPFBudgetPlanerare.Models
 {
     public enum TransactionType
     {
@@ -23,10 +17,10 @@ namespace WPFBudgetPlanerare.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal Amount { get; set; }
-        public DateTime Date { get; set; }
         public TransactionType Type { get; set; } //inkomst/utgift
-        public RecurrenceType Recurrence { get; set; } //månatlig/årlig/ingen
-        public int? Month { get; set; } //för årlig återkommande
         public Category Category { get; set; }
+        public RecurrenceType Recurrence { get; set; } //månatlig/årlig/ingen
+        public int? MonthOfYear { get; set; } //årlig återkommande, 1-12 el null
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
